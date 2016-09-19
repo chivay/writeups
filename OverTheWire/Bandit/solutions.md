@@ -1,6 +1,6 @@
 ## Level 0
 This level is really simple. We just login and read password from a file.
-```shell
+```bash
 bandit0@melinda:~$ ls
 readme
 bandit0@melinda:~$ cat readme 
