@@ -133,3 +133,77 @@ bandit9@melinda:~$ strings data.txt | grep ^=
 ```
 
 ## Level 10
+```
+bandit10@melinda:~$ base64 -d data.txt 
+The password is IFukwKGsFW8MOq3IRFqrxE1hxTNEbUPR
+```
+
+## Level 11
+```
+bandit11@melinda:~$ cat data.txt | tr A-Za-z N-ZA-Mn-za-m
+The password is 5Te8Y4drgCRfCx8ugdwuEX8KFC6k2EUu
+```
+
+## Level 12
+This is one of the most daunting and boring levels, so brace yourselves.
+First, we need to reverse hexdump of file.
+```
+bandit12@melinda:~$ mkdir /tmp/butter
+bandit12@melinda:~$ xxd -r data.txt > /tmp/butter/dump.bin
+bandit12@melinda:~$ cd /tmp/butter
+```
+```
+bandit12@melinda:/tmp/butter$ file dump.bin 
+dump.bin: gzip compressed data, was "data2.bin", from Unix, last modified: Fri Nov 14 10:32:20 2014, max compression
+bandit12@melinda:/tmp/butter$ mv dump.bin data.gz
+bandit12@melinda:/tmp/butter$ gunzip data.gz
+```
+```
+bandit12@melinda:/tmp/butter$ ls
+data
+bandit12@melinda:/tmp/butter$ file data 
+data: bzip2 compressed data, block size = 900k
+bandit12@melinda:/tmp/butter$ bunzip2 data
+bunzip2: Can't guess original name for data -- using data.out
+```
+```
+bandit12@melinda:/tmp/butter$ file data.out 
+data.out: gzip compressed data, was "data4.bin", from Unix, last modified: Fri Nov 14 10:32:20 2014, max compression
+bandit12@melinda:/tmp/butter$ mv data.out data.gz
+bandit12@melinda:/tmp/butter$ gunzip data.gz
+```
+```
+bandit12@melinda:/tmp/butter$ file data 
+data: POSIX tar archive (GNU)
+bandit12@melinda:/tmp/butter$ tar -xvf data
+data5.bin
+bandit12@melinda:/tmp/butter$ tar -xvf data5.bin
+data6.bin
+```
+```
+bandit12@melinda:/tmp/butter$ file data6.bin 
+data6.bin: bzip2 compressed data, block size = 900k
+bandit12@melinda:/tmp/butter$ bunzip2 data6.bin
+bunzip2: Can't guess original name for data6.bin -- using data6.bin.out
+```
+```
+bandit12@melinda:/tmp/butter$ file data6.bin.out 
+data6.bin.out: POSIX tar archive (GNU)
+bandit12@melinda:/tmp/butter$ tar -xvf data6.bin.out
+data8.bin
+```
+```
+bandit12@melinda:/tmp/butter$ file data8.bin 
+data8.bin: gzip compressed data, was "data9.bin", from Unix, last modified: Fri Nov 14 10:32:20 2014, max compression
+bandit12@melinda:/tmp/butter$ mv data8.bin data8.gz
+bandit12@melinda:/tmp/butter$ gunzip data8.gz 
+```
+```
+bandit12@melinda:/tmp/butter$ cat data8
+The password is 8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL
+```
+Of course, if we knew the way compression was chained, we could alternatively do
+```
+bandit12@melinda:/tmp/butter$ zcat dump.bin | bzcat | zcat | tar -xO | tar -xO | bzcat | tar -xO | zcat
+The password is 8ZjyCRiBWFYkneahHwxCv3wb2a1ORpYL
+```
