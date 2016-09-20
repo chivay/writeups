@@ -1,5 +1,5 @@
 ## Level 0
-This level is really simple. We just login and read password from a file.
+This level is really simple. We just log in and read password from a file.
 ```bash
 bandit0@melinda:~$ ls
 readme
@@ -52,7 +52,7 @@ bandit4@melinda:~$ cd inhere/
 bandit4@melinda:~/inhere$ ls
 -file00  -file01  -file02  -file03  -file04  -file05  -file06  -file07  -file08  -file09
 ```
-Seems the is a few files to check. Let's try to find out something about them.
+Seems there are a few files to check. Let's try to find out something about them.
 ```
 bandit4@melinda:~/inhere$ file *
 file: Cannot open `ile00' (No such file or directory).
@@ -74,4 +74,62 @@ bandit4@melinda:~/inhere$ file -- *
 -file09: data
 bandit4@melinda:~/inhere$ cat ./-file07
 koReBOKuIDDepwhWk7jZC0RTdopnAYKh
+``
+
+## Level 5
 ```
+bandit5@melinda:~$ ls
+inhere
+bandit5@melinda:~$ cd inhere/ 
+bandit5@melinda:~/inhere$ ls
+maybehere00  maybehere03  maybehere06  maybehere09  maybehere12  maybehere15  maybehere18
+maybehere01  maybehere04  maybehere07  maybehere10  maybehere13  maybehere16  maybehere19
+maybehere02  maybehere05  maybehere08  maybehere11  maybehere14  maybehere17
+```
+We're not going to go through all those directories by hand. The hint we're given is quite useful.
+File, we're looking for has exactly 1033 bytes.
+```
+bandit5@melinda:~/inhere$ find -size 1033c
+./maybehere07/.file2
+bandit5@melinda:~/inhere$ cat ./maybehere07/.file2
+DXjZPULLxYr17uwoI01bNLQbtFemEgo7
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        bandit5@melinda:~/inhere$ 
+```
+
+## Level 6
+This time we're going to use `find` again. Redirecting `stderr` to `/dev/null` will get rid of ugly error messages.
+```
+bandit6@melinda:~$ find / -user bandit7 -group bandit6 2> /dev/null
+/var/lib/dpkg/info/bandit7.password
+bandit6@melinda:~$ cat /var/lib/dpkg/info/bandit7.password 
+HKBPTKQnIay4Fw76bEy8PVxKEDQRKTzs
+```
+
+## Level 7
+To search for our next password, the almighty `grep` will come in handy.
+```
+bandit7@melinda:~$ ls
+data.txt
+bandit7@melinda:~$ grep millionth data.txt 
+millionth	cvX2JJa4CFALtqS87jk27qwqGhBM9plV
+```
+
+## Level 8
+Here, we have to use a standard combination of 2 programs: `sort` and `uniq`. By default `uniq` gets rid of duplicated lines. Passing additional argument `-u` will print only unique lines.
+```
+bandit8@melinda:~$ ls
+data.txt
+bandit8@melinda:~$ sort data.txt | uniq -u
+UsvVyFSfZZWbi6wgC7dAFyFuR6jQQUhR
+```
+
+## Level 9
+Simple, but useful `string` will extract readable lines, `grep` will filter those with `=` at the beginning of line.
+```
+bandit9@melinda:~$ strings data.txt | grep ^=
+========== password
+========== ism
+========== truKLdjsbJ5g7yyJ2X2R0o3a5HQJFuLk
+```
+
+## Level 10
