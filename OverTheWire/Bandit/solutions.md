@@ -289,3 +289,103 @@ dxviW8+TFVEBl1O4f7HVm6EpTscdDxU+bCXWkfjuRb7Dy9GOtt9JPsX8MBTakzh3
 vBgsyi/sN3RqRBcGU40fOoZyfAMT8s1m/uYv52O6IgeuZ/ujbjY=
 -----END RSA PRIVATE KEY-----
 ```
+
+## Level 17
+Last time, we've got a private key, so begin by logging in using this identity. SSH is probably going to complain about file permissions, so `chmod` private key to something like `600`.
+```
+bandit17@melinda:~$ diff passwords.old passwords.new
+42c42
+< BS8bqB1kqkinKJjuxL6k072Qq9NRwQpR
+---
+> kfBf3eYk5BPBRzwjqutbbfE887SVc5Yd
+```
+
+## Level 18
+Although someone was really nice and modified our `.bashrc`, we can still ask SSH to run some command for us
+```
+ssh bandit18@bandit.labs.overthewire.org "cat readme"
+
+This is the OverTheWire game server. More information on http://www.overthewire.org/wargames
+
+Please note that wargame usernames are no longer level<X>, but wargamename<X>
+e.g. vortex4, semtex2, ...
+
+Note: at this moment, blacksun is not available.
+
+bandit18@bandit.labs.overthewire.org's password: 
+IueksS7Ubh8G3DCwVzrTd8rAVOwq3M5x
+```
+
+## Level 19
+```
+bandit19@melinda:~$ ls -l
+total 8
+-rwsr-x--- 1 bandit20 bandit19 7370 Nov 14  2014 bandit20-do
+```
+We can see that this executable has permission `s`. Thus, we'll be able to read file normally inaccessible.
+```
+bandit19@melinda:~$ ./bandit20-do 
+Run a command as another user.
+  Example: ./bandit20-do id
+bandit19@melinda:~$ ./bandit20-do cat /etc/bandit_pass/bandit20
+GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+```
+
+## Level 20
+This is the first time we're going to use two terminals at the same time.
+Let's start the server on the first one
+```
+bandit20@melinda:~$ nc -l -p 12345 <<< "GbKksEFF4yrVs6il55v6gwY5aVje5f0j"
+```
+And connect to it on the other one
+```
+bandit20@melinda:~$ ./suconnect 
+Usage: ./suconnect <portnumber>
+This program will connect to the given port on localhost using TCP. If it receives the correct password from the other side, the next password is transmitted back.
+bandit20@melinda:~$ ./suconnect 12345
+Read: GbKksEFF4yrVs6il55v6gwY5aVje5f0j
+Password matches, sending next password
+```
+We should see password to the next level: `gE269g2h3mw3pwgrj0Ha9Uoqen1c9DGr`
+
+## Level 21
+Let's read the crontab.
+```
+bandit21@melinda:~$ cat /etc/cron.d/cronjob_bandit22
+* * * * * bandit22 /usr/bin/cronjob_bandit22.sh &> /dev/null
+```
+And see what script is cron executing.
+```
+bandit21@melinda:~$ cat /usr/bin/cronjob_bandit22.sh 
+#!/bin/bash
+chmod 644 /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+cat /etc/bandit_pass/bandit22 > /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+```
+`cat` will do the job.
+```
+bandit21@melinda:~$ cat /tmp/t7O6lds9S0RqQh9aMcz6ShpAoZKF7fgv
+Yk7owGAcWjwMVRwrTesJEwB7WVOiILLI
+```
+
+## Level 22
+We're starting just like we did before.
+```
+bandit22@melinda:~$ cat /etc/cron.d/cronjob_bandit23
+* * * * * bandit23 /usr/bin/cronjob_bandit23.sh  &> /dev/null
+bandit22@melinda:~$ cat /usr/bin/cronjob_bandit23.sh 
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+```
+Script is writing password to some place in `/tmp`. We have to make out where.
+```
+bandit22@melinda:~$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1 
+8ca319486bfbbc3663ea0fbe81326349
+bandit22@melinda:~$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
+jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
+```
