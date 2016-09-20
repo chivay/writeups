@@ -74,7 +74,7 @@ bandit4@melinda:~/inhere$ file -- *
 -file09: data
 bandit4@melinda:~/inhere$ cat ./-file07
 koReBOKuIDDepwhWk7jZC0RTdopnAYKh
-``
+```
 
 ## Level 5
 ```
