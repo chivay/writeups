@@ -463,6 +463,7 @@ more ~/text.txt
 exit 0
 ```
 To avoid exiting `more`, resize terminal to just a few lines. Reading man pages, reveals that `v` key will launch deafult text editor(vim). To read password type `:e /etc/bandit_pass/bandit26`. The password is `5czgV9L3Xx8JPOyRbXh6lQbmIOWvPT6Z`.
+```
 
-FIN
+## FIN
 
