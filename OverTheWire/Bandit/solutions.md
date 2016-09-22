@@ -388,7 +388,7 @@ bandit22@melinda:~$ echo I am user bandit23 | md5sum | cut -d ' ' -f 1
 8ca319486bfbbc3663ea0fbe81326349
 bandit22@melinda:~$ cat /tmp/8ca319486bfbbc3663ea0fbe81326349
 jc1udXuA1tiHqjIsL8yaapX5XIAI6i0n
-``
+```
 
 ## Level 23
 ```
@@ -463,7 +463,6 @@ more ~/text.txt
 exit 0
 ```
 To avoid exiting `more`, resize terminal to just a few lines. Reading man pages, reveals that `v` key will launch deafult text editor(vim). To read password type `:e /etc/bandit_pass/bandit26`. The password is `5czgV9L3Xx8JPOyRbXh6lQbmIOWvPT6Z`.
-```
 
 ## FIN
 
