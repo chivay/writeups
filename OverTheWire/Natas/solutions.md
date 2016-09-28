@@ -84,7 +84,7 @@ Our clever trick from previous level will work here as well, revealing password 
 
 
 ## Level 11
-```
+```php
 <?
 $defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
 
