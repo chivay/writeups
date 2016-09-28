@@ -154,7 +154,7 @@ payload = [ x^y for x,y in zip(target, itertools.cycle(key))]
 
 print(base64.b64encode(bytes(payload)).decode())
 ```
-Sending new cookie oututs password.
+Sending new cookie makes script print the password.
 `The password for natas12 is EDXp0pS26wLKHZy1rDBPUZk0RKfLGIR3`
 
 ## Level 12
