@@ -84,6 +84,79 @@ Our clever trick from previous level will work here as well, revealing password 
 
 
 ## Level 11
+```
+<?
+$defaultdata = array( "showpassword"=>"no", "bgcolor"=>"#ffffff");
+
+function xor_encrypt($in) {
+    $key = '<censored>';
+    $text = $in;
+    $outText = '';
+
+    // Iterate through each character
+    for($i=0;$i<strlen($text);$i++) {
+    $outText .= $text[$i] ^ $key[$i % strlen($key)];
+    }
+
+    return $outText;
+}
+
+function loadData($def) {
+    global $_COOKIE;
+    $mydata = $def;
+    if(array_key_exists("data", $_COOKIE)) {
+    $tempdata = json_decode(xor_encrypt(base64_decode($_COOKIE["data"])), true);
+    if(is_array($tempdata) && array_key_exists("showpassword", $tempdata) && array_key_exists("bgcolor", $tempdata)) {
+        if (preg_match('/^#(?:[a-f\d]{6})$/i', $tempdata['bgcolor'])) {
+        $mydata['showpassword'] = $tempdata['showpassword'];
+        $mydata['bgcolor'] = $tempdata['bgcolor'];
+        }
+    }
+    }
+    return $mydata;
+}
+
+function saveData($d) {
+    setcookie("data", base64_encode(xor_encrypt(json_encode($d))));
+}
+
+$data = loadData($defaultdata);
+
+if(array_key_exists("bgcolor",$_REQUEST)) {
+    if (preg_match('/^#(?:[a-f\d]{6})$/i', $_REQUEST['bgcolor'])) {
+        $data['bgcolor'] = $_REQUEST['bgcolor'];
+    }
+}
+
+saveData($data);
+?>
+```
+After looking at this code we can make out a few things. Cookie named `data` is storing representation of array. It is encrypted with some unknown key, and then encoded with base64. By default our cookie is storing data from `$deafultdata`. Now that we know both plaintext and ciphertext, we can extract encryption key and then encrypt our target configuration and send it as cookie. To do all these steps, I wrote a simple Python script, which prints new cookie.
+```python
+import itertools
+import base64
+
+cookie = 'ClVLIh4ASCsCBE8lAxMacFMZV2hdVVotEhhUJQNVAmhSEV4sFxFeaAw='
+
+origin = bytes('{"showpassword":"no","bgcolor":"#ffffff"}'.encode())
+target = bytes('{"showpassword":"yes","bgcolor":"#ffffff"}'.encode())
+
+# Remove b64 encoding
+encrypted = bytes(base64.b64decode(cookie))
+
+# XOR encrypted string with plaintext
+key = bytes([ x^y for x,y in zip(encrypted, origin)])
+
+# Cut to first 4 bytes
+key = key[:4]
+
+payload = [ x^y for x,y in zip(target, itertools.cycle(key))]
+
+print(base64.b64encode(bytes(payload)).decode())
+```
+Sending new cookie oututs password.
+`The password for natas12 is EDXp0pS26wLKHZy1rDBPUZk0RKfLGIR3`
+
 ## Level 12
 ## Level 13
 ## Level 14
